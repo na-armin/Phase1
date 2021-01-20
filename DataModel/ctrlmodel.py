@@ -1,4 +1,4 @@
-from DataModel import model as m
+from DataModel import neo4jModel as m
 from neomodel import UniqueProperty, DoesNotExist, db
 from datetime import date
 
@@ -43,10 +43,8 @@ class ctrlModel():
     def createWroteRel(self):
         try:
             print('Creating WROTE relationship between given nodes')
-            searchNodes('Pless').wrote.connect(
-                m.searchNodes('Here be dragons'))
-            searchNodes('Lucy').wrote.connect(
-                searchNodes('Initial Commit'))
+            self.searchNodes('Pless').wrote.connect(m.searchNodes('Here be dragons'))
+            searchNodes('Lucy').wrote.connect(searchNodes('Initial Commit'))
             print( 'Creating WROTE relationship between given nodes' )
         except Exception as e:
             raise e

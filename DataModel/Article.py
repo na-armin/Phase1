@@ -9,6 +9,11 @@ class MetaData:
     def __str__(self):
         return f"{self.title}, In:{self.publisher} ({self.year})"
 
+class Content:
+    def __init__(self,abstract,file_text):
+        self.abstract = abstract
+        self.file_text = file_text
+
 class Section:
     def __init__(self,header,text,subsection=[]):
         self.header=header
