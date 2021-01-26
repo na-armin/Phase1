@@ -22,6 +22,7 @@ class Sentence(StructuredNode):
 class Article(StructuredNode):
     uid = UniqueIdProperty()
     title = StringProperty(unique_index=True, required=True)
+    abstract = StringProperty(unique_index=True, required=True)
     year = IntegerProperty(index=True, default=1800)
 
     def __init__(self, file_name):
