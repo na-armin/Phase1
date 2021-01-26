@@ -3,15 +3,15 @@ import multiprocessing
 import os
 import warnings
 from bs4 import BeautifulSoup
-import DataModel.DataModel as dm
+import DataModel.dataModel as dm
 
 
 class ReadFile_ART:
     def __init__(self):
         self.multiprocessing_cpu_count = 5
 
+    # Reads file
     def ReadXMLArticelFromFile(self, filePath):
-        # Reads file
         file_txt = io.open(filePath, mode='r', encoding='utf-8')
         txt = file_txt.read()
         file_txt.close()
@@ -20,8 +20,10 @@ class ReadFile_ART:
     def SetDataModel(self,filePath):
         article = dm.Article(filePath,0)
         file_text = self.ReadXMLArticelFromFile(filePath)
-        soup = BeautifulSoup(file_text, 'xml')
+        soup = BeautifulSoup(file_text, 'lxml')
         titleList = soup.find_all('TITLE')
+        title=""
+        abstract=""
         for tit in titleList:
             title= tit.get_text()
         abstractList=soup.find_all('ABSTRACT')
@@ -30,8 +32,8 @@ class ReadFile_ART:
         print(title)
         print(abstract)
         print(file_text)
-        article.Set_MetaData(title)
-        article.Set_Content(abstract, file_text)
+        # article.Set_MetaData(title)
+        # article.Set_Content(abstract, file_text)
         return
 
     def listPathOfFillesInFolder(self, path_of_folder):

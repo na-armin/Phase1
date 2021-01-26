@@ -1,13 +1,4 @@
-class MetaData:
-    def __init__(self,title,authorList=[],publisher="",year=1800):
-        self.title=title
-        self.authorList=authorList
-        self.publisher=publisher
-        self.year=year
 
-    # Instance method
-    def __str__(self):
-        return f"{self.title}, In:{self.publisher} ({self.year})"
 
 class Content:
     def __init__(self,abstract,file_text):
