@@ -3,7 +3,7 @@ import multiprocessing
 import os
 import warnings
 from bs4 import BeautifulSoup
-import DataModel.dataModel as dm
+import DataModel.model as dm
 
 
 class ReadFile_ART:
@@ -26,12 +26,13 @@ class ReadFile_ART:
         return txt
 
     def SetDataModel(self, filePath):
-        article_temp = dm.Article(filePath, 0)
+
         file_text = self.ReadXMLFile(filePath)
 
+        article_temp = dm.Article(filePath, 0)
         article_temp.title = ""
         article_temp.abstract = ""
-
+        listOfSentences= []
         soup = BeautifulSoup(file_text, 'xml')
         titleList = soup.find_all('TITLE')
         for tit in titleList:
