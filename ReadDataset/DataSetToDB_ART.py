@@ -3,10 +3,19 @@ import multiprocessing
 import os
 import warnings
 from bs4 import BeautifulSoup
-import DataModel.model as dm
+from DataModel import DB_model as dm
+from neomodel import db, config
+
+config.DATABASE_URL = 'bolt://neo4j:123@localhost:7687'
 
 
-class ReadFile_ART:
+def deleteData():
+    print('Delete all nodes and relationships...')
+    query = 'MATCH (n) DETACH DELETE n'
+    db.cypher_query(query)
+
+
+class InsertToDB_ART_Files:
     def __init__(self):
         self.multiprocessing_cpu_count = 5
 
@@ -19,50 +28,55 @@ class ReadFile_ART:
             PathOfFillesList.append(temp)
         return PathOfFillesList
 
-    def ReadXMLFile(self, filePath):
+    def ReadFile(self, filePath):
         file_txt = io.open(filePath, mode='r', encoding='utf-8')
         txt = file_txt.read()
         file_txt.close()
         return txt
 
-    def SetDataModel(self, filePath):
+    def FileToDB(self, filePath):
 
-        file_text = self.ReadXMLFile(filePath)
-
-        article_temp = dm.Article(filePath, 0)
-        article_temp.title = ""
-        article_temp.abstract = ""
-        listOfSentences= []
+        file_text = self.ReadFile(filePath)
         soup = BeautifulSoup(file_text, 'xml')
-        titleList = soup.find_all('TITLE')
-        for tit in titleList:
-            article_temp.title = tit.get_text()
-        abstractList = soup.find_all('ABSTRACT')
-        for abs in abstractList:
-            article_temp.abstract = abs.get_text()
-        print("Title:")
-        print(article_temp.title)
-        print("Abstract:")
-        print(article_temp.abstract)
-        print("Pretty file:")
-        print(soup.prettify())
-        # article.Set_MetaData(title)
-        # article.Set_Content(abstract, file_text)
+
+        This_article = dm.Article(file_path=filePath, title=soup.TITLE.get_text(),
+                                  abstract=soup.ABSTRACT.get_text())
+        This_article.save()
+
+        sentenceList = []
+        for s in soup.find_all('s'):
+            header_name = ""
+            header_index = 0
+            for p in s.parents:
+                if p.name == "DIV":
+                    header_index = p['DEPTH']
+                    header_name = p.HEADER.get_text()
+                    if header_name == "":
+                        header_name = "BODY"
+                    break
+                if p.name == "TITLE" or p.name == "ABSTRACT":
+                    header_name = p.name
+                    break
+            This_sentence = dm.Sentence(sid=s['sid'], text=s.get_text(), type=s.annotationART['type'],
+                                        Header=header_name)
+            This_sentence.save()
+            sentenceList.append(This_sentence)
         return
 
     def preprocessAllFilesInFolder(self, path_of_folder):
-        files = self.listPathOfFillesInFolder(path_of_folder)
+        files = self.PathOfFillesInFolder(path_of_folder)
         # creating a pool
         p = multiprocessing.Pool(self.multiprocessing_cpu_count)
         # map list to target function
-        tempDoc = p.map(self.SetDataModel, files)
+        tempDoc = p.map(self.FileToDB, files)
         p.close()
         p.join()
         return tempDoc
 
 
 if __name__ == "__main__":
-    Scr_path = '../ART_Corpus/ann1'  # Adrress : Folder of source files
-    ARTFile = ReadFile_ART()
+    deleteData()
+    Scr_path = '../ART_Corpus/ann0'  # Adrress : Folder of source files
+    ARTFile = InsertToDB_ART_Files()
     tempDoc = ARTFile.preprocessAllFilesInFolder(Scr_path)
     print(len(tempDoc))

@@ -1,17 +1,16 @@
-from datetime import date
 
 from neomodel import config,UniqueProperty, DoesNotExist,db
 
-from DataModel.model import *
+from DataModel.DB_model import *
 
 config.DATABASE_URL = 'bolt://neo4j:123@localhost:7687'
 
 class ctrlModel():
 
-    def createNodes(self):
+    def createNodes(self,t_file_path,t_title,t_abstract):
         try:
             # Create Authors
-            Author(name='Pless').save()
+
             Author(name='Lucy').save()
             # Create Article
             Article(title='Here be dragons', abstract="ab sd", published_year=date(1950, 12, 12)).save()
